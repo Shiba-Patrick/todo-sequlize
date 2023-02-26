@@ -51,6 +51,16 @@ app.get('/users/logout', (req, res) => {
   res.send('logout')
 })
 
+//show one todo:
+//查詢單筆資料：res.render時在物件實例串上toJSON:資料轉換成 plain object 的方法
+//
+app.get('/todos/:id', (req, res) => {
+  const id = req.params.id
+  return Todo.findByPk(id) //尚未使用User關聯
+    .then(todo => res.render('detail', { todo: todo.toJSON() }))
+    .catch(error => console.log(error))
+})
+
 app.listen(PORT, () => {
   console.log(`App is running on http://localhost:${PORT}`)
 })
