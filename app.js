@@ -5,6 +5,11 @@ const bcrypt = require('bcryptjs')
 const app = express()
 const PORT = 3000
 
+//載入 Model 設定檔
+const db = require('./models')
+const Todo = db.Todo
+const User = db.User
+
 //handlebars
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
@@ -33,8 +38,11 @@ app.get('/users/register', (req, res) => {
   res.render('register')
 })
 
+//將註冊資料寫進資料庫
 app.post('/users/register', (req, res) => {
-  res.send('register')
+  const { name, email, password , confirmPassword} = req.body
+  User.create({ name, email, password })
+  .then(user => res.redirect('/') )
 })
 
 app.get('/users/logout', (req, res) => {
