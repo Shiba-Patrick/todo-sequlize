@@ -40,15 +40,30 @@ app.get('/users/register', (req, res) => {
   res.render('register')
 })
 
-//將註冊資料寫進資料庫
+//將註冊資料寫進資料庫: 運用where的sequelize語法
 app.post('/users/register', (req, res) => {
   const { name, email, password , confirmPassword} = req.body
-  User.create({ name, email, password })
-  .then(user => res.redirect('/') )
-})
-
-app.get('/users/logout', (req, res) => {
-  res.send('logout')
+  User.findOne({ where: { email } }).then(user => {
+    if (user) {
+      console.log('User already exists')
+      return res.render('register', {
+        name,
+        email,
+        password,
+        confirmPassword
+      })
+    }
+    return bcrypt
+      .genSalt(10)
+      .then(salt => bcrypt.hash(password, salt))
+      .then(hash => User.create({
+        name,
+        email,
+        password: hash
+      }))
+      .then(() => res.redirect('/'))
+      .catch(err => console.log(err))
+  })
 })
 
 //show one todo:
